@@ -1,0 +1,207 @@
+<div class="flex h-screen bg-slate-50 overflow-hidden font-sans flex-col md:flex-row">
+  
+  <!-- Mobile Header -->
+  <header class="md:hidden bg-slate-900 text-white p-4 flex justify-between items-center z-30 shrink-0 shadow-md">
+    <div class="flex items-center gap-3">
+       <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shadow-inner"
+           [ngClass]="{
+             'bg-gradient-to-br from-indigo-500 to-purple-600': currentUserRole() === 'CEO',
+             'bg-gradient-to-br from-blue-500 to-cyan-600': currentUserRole() === 'Project Manager',
+             'bg-gradient-to-br from-pink-500 to-rose-600': currentUserRole() === 'Designer'
+           }">
+        @if(currentUserRole() === 'CEO') { م }
+        @else if(currentUserRole() === 'Project Manager') { ت }
+        @else { ص }
+      </div>
+      <span class="font-bold text-sm">
+        @if(currentUserRole() === 'CEO') { المدير العام }
+        @else if(currentUserRole() === 'Project Manager') { إدارة المشاريع }
+        @else { مساحة المصمم }
+      </span>
+    </div>
+    <button (click)="toggleSidebar()" class="p-2 text-slate-300 hover:text-white">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </header>
+
+  <!-- Sidebar Overlay (Mobile) -->
+  @if(isSidebarOpen()) {
+    <div (click)="closeSidebar()" class="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm animate-fade-in"></div>
+  }
+
+  <!-- Sidebar (Right side for RTL) -->
+  <aside 
+    class="fixed inset-y-0 right-0 w-72 bg-slate-900 text-white flex flex-col transition-transform duration-300 shadow-2xl z-50 md:relative md:translate-x-0 md:flex md:shrink-0 md:h-full"
+    [class.translate-x-full]="!isSidebarOpen()"
+    [class.translate-x-0]="isSidebarOpen()">
+    
+    <!-- Mobile Close Button -->
+    <div class="md:hidden p-4 flex justify-end">
+       <button (click)="closeSidebar()" class="text-slate-400 hover:text-white p-2">
+         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+       </button>
+    </div>
+
+    <!-- App Brand & Role Indicator -->
+    <div class="p-6 border-b border-slate-800 flex items-center gap-4">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xl shadow-lg shadow-indigo-500/30 transition-colors"
+           [ngClass]="{
+             'bg-gradient-to-br from-indigo-500 to-purple-600': currentUserRole() === 'CEO',
+             'bg-gradient-to-br from-blue-500 to-cyan-600': currentUserRole() === 'Project Manager',
+             'bg-gradient-to-br from-pink-500 to-rose-600': currentUserRole() === 'Designer'
+           }">
+        @if(currentUserRole() === 'CEO') { م }
+        @else if(currentUserRole() === 'Project Manager') { ت }
+        @else { ص }
+      </div>
+      <div>
+        <h1 class="font-bold text-lg tracking-wide">
+          @if(currentUserRole() === 'CEO') { المدير العام }
+          @else if(currentUserRole() === 'Project Manager') { إدارة المشاريع }
+          @else { مساحة المصمم }
+        </h1>
+        <p class="text-xs text-slate-400">
+           @if(currentUserRole() === 'CEO') { Strategic Command }
+           @else if(currentUserRole() === 'Project Manager') { Operational Hub }
+           @else { Deep Work Mode }
+        </p>
+      </div>
+    </div>
+
+    <!-- Role Switcher (For Demo Purpose) -->
+    <div class="px-6 py-4">
+      <div class="bg-slate-800 p-1 rounded-lg flex text-xs font-medium">
+        <button (click)="switchRole('CEO')" 
+          class="flex-1 py-1.5 rounded-md transition-all text-center"
+          [ngClass]="currentUserRole() === 'CEO' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-white'">
+          CEO
+        </button>
+        <button (click)="switchRole('Project Manager')" 
+          class="flex-1 py-1.5 rounded-md transition-all text-center"
+          [ngClass]="currentUserRole() === 'Project Manager' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-white'">
+          PM
+        </button>
+        <button (click)="switchRole('Designer')" 
+          class="flex-1 py-1.5 rounded-md transition-all text-center"
+          [ngClass]="currentUserRole() === 'Designer' ? 'bg-pink-600 text-white shadow' : 'text-slate-400 hover:text-white'">
+          Des
+        </button>
+      </div>
+      <p class="text-[10px] text-slate-500 text-center mt-2">تبديل الدور (محاكاة)</p>
+    </div>
+
+    <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+      <div class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">القائمة الرئيسية</div>
+      
+      <!-- CEO Links -->
+      @if (currentUserRole() === 'CEO') {
+        <button 
+          (click)="setView('dashboard')" 
+          [class.bg-indigo-600]="currentView() === 'dashboard'"
+          [class.text-white]="currentView() === 'dashboard'"
+          [class.text-slate-400]="currentView() !== 'dashboard'"
+          class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-800 hover:text-white transition-all text-sm font-medium">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          نظرة عامة
+        </button>
+
+        <button 
+          (click)="setView('users')" 
+          [class.bg-indigo-600]="currentView() === 'users'"
+          [class.text-white]="currentView() === 'users'"
+          [class.text-slate-400]="currentView() !== 'users'"
+          class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-800 hover:text-white transition-all text-sm font-medium">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          إدارة الفريق
+        </button>
+      }
+
+      <!-- PM Links -->
+      @if (currentUserRole() === 'Project Manager') {
+        <button 
+          (click)="setView('pm-dashboard')" 
+          [class.bg-blue-600]="currentView() === 'pm-dashboard'"
+          [class.text-white]="currentView() === 'pm-dashboard'"
+          [class.text-slate-400]="currentView() !== 'pm-dashboard'"
+          class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-800 hover:text-white transition-all text-sm font-medium">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          لوحة العمليات (Kanban)
+        </button>
+      }
+
+      <!-- Designer Links -->
+      @if (currentUserRole() === 'Designer') {
+        <button 
+          (click)="setView('designer-dashboard')" 
+          [class.bg-pink-600]="currentView() === 'designer-dashboard'"
+          [class.text-white]="currentView() === 'designer-dashboard'"
+          [class.text-slate-400]="currentView() !== 'designer-dashboard'"
+          class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-800 hover:text-white transition-all text-sm font-medium">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          مهامي (Deep Work)
+        </button>
+      }
+
+      <!-- Shared Links -->
+      <button 
+        (click)="setView('notifications')" 
+        [class.bg-indigo-600]="currentUserRole() === 'CEO' && currentView() === 'notifications'"
+        [class.bg-blue-600]="currentUserRole() === 'Project Manager' && currentView() === 'notifications'"
+        [class.bg-pink-600]="currentUserRole() === 'Designer' && currentView() === 'notifications'"
+        [class.text-white]="currentView() === 'notifications'"
+        [class.text-slate-400]="currentView() !== 'notifications'"
+        class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-slate-800 hover:text-white transition-all text-sm font-medium">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        الإشعارات
+      </button>
+    </nav>
+
+    <!-- User Profile Footer -->
+    <div class="p-4 border-t border-slate-800">
+      <div class="flex items-center gap-3 px-2 bg-slate-800/50 p-3 rounded-xl border border-slate-700/50">
+        <img [src]="currentUserRole() === 'CEO' ? 'https://i.pravatar.cc/150?u=1' : (currentUserRole() === 'Project Manager' ? 'https://i.pravatar.cc/150?u=2' : 'https://i.pravatar.cc/150?u=3')" alt="User" class="w-10 h-10 rounded-full border-2" 
+        [ngClass]="{
+            'border-indigo-500': currentUserRole() === 'CEO',
+            'border-blue-500': currentUserRole() === 'Project Manager',
+            'border-pink-500': currentUserRole() === 'Designer'
+        }">
+        <div>
+          <p class="text-sm font-bold text-white">
+            @if(currentUserRole() === 'CEO') { فيصل المدير }
+            @else if(currentUserRole() === 'Project Manager') { سارة (PM) }
+            @else { محمد (Designer) }
+          </p>
+          <p class="text-xs text-green-400 flex items-center gap-1">
+             <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+             @if(currentUserRole() === 'CEO') { Admin }
+             @else if(currentUserRole() === 'Project Manager') { Manager }
+             @else { Active }
+          </p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto bg-slate-50 relative scroll-smooth w-full">
+    <div class="p-4 md:p-8 max-w-7xl mx-auto h-full">
+      @switch (currentView()) {
+        @case ('dashboard') {
+          <app-dashboard-view></app-dashboard-view>
+        }
+        @case ('users') {
+          <app-users-view></app-users-view>
+        }
+        @case ('notifications') {
+          <app-notifications-view></app-notifications-view>
+        }
+        @case ('pm-dashboard') {
+          <app-pm-dashboard></app-pm-dashboard>
+        }
+        @case ('designer-dashboard') {
+          <app-designer-dashboard></app-designer-dashboard>
+        }
+      }
+    </div>
+  </main>
+</div>
